@@ -1,0 +1,109 @@
+On souhaite modéliser et afficher les étapes de manipulation technique d’une biopsie dans un laboratoire d’anatomopathologie.
+
+La hiérarchie est la suivante :
+
+1. **Dossier**
+2. **Prélèvements** (un dossier contient un ou plusieurs prélèvements)
+3. **Blocs** (un prélèvement contient un ou plusieurs blocs)
+4. **Lames** (un bloc contient une ou plusieurs lames)
+5. **Coloration** (chaque lame a une coloration associée, par exemple “HES”, “PAS”, “IHC” etc.)
+
+L’objectif est de construire :
+
+- une **API NestJS** simple pour créer et récupérer des dossiers,
+- une **interface React TypeScript** pour visualiser graphiquement cette hiérarchie et créer de nouveaux dossiers via un formulaire.
+
+---
+
+## **Objectifs**
+
+### **1. Backend – NestJS**
+
+Créer une petite API NestJS avec les caractéristiques suivantes :
+
+- **Pas d’authentification**.
+- **Pas de base de données “réelle”** obligatoire :
+    - Les données peuvent être stockées dans un **simple fichier JSON** sur le disque (par exemple data.json), chargé au démarrage et réécrit à chaque modification.
+- **Endpoints minimum attendus** :
+    1. POST /cases
+        - Crée un nouveau dossier avec sa structure complète : prélèvements, blocs et lames.
+        - Le format JSON doit permettre de représenter :
+            - un identifiant de dossier (string ou number),
+            - une liste de prélèvements, chacun avec :
+                - un identifiant,
+                - une liste de blocs, chacun avec :
+                    - un identifiant,
+                    - une liste de lames, chacune avec :
+                        - un identifiant,
+                        - un champ coloration (string).
+    2. GET /cases
+        - Retourne la liste des dossiers existants.
+    3. GET /cases/:id
+        - Retourne le détail complet d’un dossier (avec prélèvements, blocs et lames).
+
+> Bonus (optionnel)
+> 
+- Mise en place d’une vraie base de données SQL avec Prisma (PostgreSQL ou SQLite au choix).
+
+---
+
+### **2. Frontend – React + TypeScript**
+
+Créer une application React TypeScript qui consomme l’API précédente.
+
+### **2.1. Visualisation du graphe**
+
+Mettre en place une page qui affiche **un dossier** sous forme de “graphe hiérarchique” :
+
+- En **haut**, les *prélèvements* du dossier : Prélèvement 1, Prélèvement 2, etc.
+- **Sous chaque prélèvement**, afficher ses **blocs** avec des flèches ou une structure qui montre clairement la relation :
+    - Exemple : Prélèvement 1 → Bloc A, Bloc B, etc.
+- **Sous chaque bloc**, afficher ses **lames**, avec pour chacune la **coloration** :
+    - Exemple : Bloc A → Lame 1 (HES), Lame 2 (PAS), Lame 2 (IHC).
+
+L’affichage doit permettre de voir clairement, pour un dossier donné :
+
+- quels prélèvements il contient,
+- quels blocs appartiennent à chaque prélèvement,
+- quelles lames appartiennent à chaque bloc, avec leurs colorations.
+
+La mise en forme peut être simple (boîtes + flèches, ou colonnes imbriquées), l’important est que la **hiérarchie soit visuellement très claire**.
+
+### **2.2. Formulaire de création de dossier**
+
+Créer un formulaire React pour **ajouter un nouveau dossier** :
+
+- Le formulaire doit permettre :
+    - d’ajouter **un ou plusieurs prélèvements**,
+    - pour chaque prélèvement, **un ou plusieurs blocs**,
+    - pour chaque bloc, **une ou plusieurs lames**,
+    - pour chaque lame, saisir **la coloration** (champ texte simple).
+- Une fois le formulaire soumis :
+    - envoyer la structure complète au backend via POST /cases,
+    - afficher un message de succès ou d’erreur,
+    - idéalement, recharger la visualisation du dossier créé.
+
+> Bonus (optionnel)
+> 
+- Sélection d’un dossier dans une liste pour en afficher le graphe.
+
+---
+
+## **Contraintes & attentes**
+
+- **Temps max estimé** : 3 heures.
+- **Stack imposée** :
+    - Backend : NestJS.
+    - Frontend : React + TypeScript.
+- **Pas d’authentification**, pas de gestion d’utilisateurs.
+- Stockage minimum : **fichier JSON** (base SQL + Prisma uniquement en bonus).
+
+---
+
+## **Livrables attendus**
+
+1. **Code du backend** NestJS ( avec un README rapide pour expliquer comment lancer l’API).
+2. **Code du frontend** React TypeScript (avec instructions de démarrage).
+3. Une démo minimale fonctionnelle :
+    - on peut **créer un dossier** avec sa structure complète,
+    - on peut **visualiser au moins un dossier** sous forme de graphe hiérarchique.
