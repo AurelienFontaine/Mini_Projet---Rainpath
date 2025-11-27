@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Case {
+  id           String         @id
+  prelevements Prelevement[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Prelevement {
+  pk        String   @id @default(cuid())
+  id        String
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  blocs     Bloc[]
+
+  @@unique([caseId, id])
+}
+
+model Bloc {
+  pk             String   @id @default(cuid())
+  id             String
+  prelevementPk  String
+  prelevement    Prelevement @relation(fields: [prelevementPk], references: [pk], onDelete: Cascade)
+  lames          Lame[]
+
+  @@unique([prelevementPk, id])
+}
+
+model Lame {
+  pk         String  @id @default(cuid())
+  id         String
+  blocPk     String
+  bloc       Bloc    @relation(fields: [blocPk], references: [pk], onDelete: Cascade)
+  coloration String
+
+  @@unique([blocPk, id])
+}
+
+// End of schema
