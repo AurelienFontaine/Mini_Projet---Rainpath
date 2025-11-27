@@ -372,9 +372,9 @@ export function CaseCreate() {
                 </div>
                 <div style={{ marginTop: 8 }}>
                   {p.blocs.map((b, bIndex) => (
-                    <div key={bIndex} style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 8 }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <span>Bloc</span>
+                    <div key={bIndex} className="section level1">
+                      <div className="section-header">
+                        <span className="section-title">Bloc</span>
                         <input
                           value={b.id}
                           onChange={(e) => updateBlocId(pIndex, bIndex, e.target.value)}
@@ -405,10 +405,10 @@ export function CaseCreate() {
                         </button>
                         <div style={{ marginLeft: 'auto' }} />
                       </div>
-                      <div style={{ marginLeft: 16, marginTop: 8 }}>
+                      <div className="section level2">
                         {b.lames.map((l, lIndex) => (
-                          <div key={lIndex} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-                            <span>Lame</span>
+                          <div key={lIndex} className="section-header" style={{ marginBottom: 6 }}>
+                            <span className="section-title">Lame</span>
                             <input
                               value={l.id}
                               onChange={(e) => updateLame(pIndex, bIndex, lIndex, 'id', e.target.value)}
