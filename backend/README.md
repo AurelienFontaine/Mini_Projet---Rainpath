@@ -68,7 +68,7 @@ Exemple de payload pour `POST /cases`:
   ]
 }
 ```
-Si `id` est omis, un identifiant est généré automatiquement.
+Remarque : côté API, si `id` est omis, un identifiant est généré automatiquement. Côté interface web “Créer un dossier”, un nom de dossier est requis pour guider l’utilisateur.
 
 ## Modèle & contraintes
 - Clés primaires techniques (`pk`) pour prélevements/blocs/lames.

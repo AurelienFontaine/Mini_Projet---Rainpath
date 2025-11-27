@@ -6,6 +6,7 @@ backend/dist
 backend/dev.db
 backend/.backend.log
 backend/.backend.pid
+backend/.env
 
 # Frontend build artifacts
 frontend/dist
