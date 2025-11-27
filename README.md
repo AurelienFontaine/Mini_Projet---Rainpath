@@ -1,3 +1,9 @@
+
+
+
+
+
+
 ## Rainpath
 
 Application de démonstration pour modéliser et afficher la hiérarchie d’une biopsie en anatomopathologie.
@@ -27,7 +33,34 @@ Rainpath/
 - npm >= 9
 - Optionnel: `curl` pour tester l’API
 
-## Démarrage rapide (recommandé)
+## Installation npm
+## Linux (nvm)
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+source ~/.bashrc  # or ~/.profile / ~/.zshrc
+nvm install --lts
+nvm use --lts
+node -v
+npm -v
+```
+
+## macOS — nvm
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+source ~/.zshrc
+nvm install --lts
+nvm use --lts
+node -v
+npm -v
+```
+
+## Démarrage rapide
 
 ```bash
 make
