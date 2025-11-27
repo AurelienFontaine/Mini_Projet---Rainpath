@@ -1,9 +1,3 @@
-
-
-
-
-
-
 ## Rainpath
 
 Application de démonstration pour modéliser et afficher la hiérarchie d’une biopsie en anatomopathologie.
@@ -33,7 +27,7 @@ Rainpath/
 - npm >= 9
 - Optionnel: `curl` pour tester l’API
 
-## Installation npm
+## Installation nvm
 ## Linux (nvm)
 
 ```bash
