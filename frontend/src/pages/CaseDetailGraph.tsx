@@ -72,7 +72,7 @@ export function CaseDetailGraph() {
                           b.lames.map((l) => (
                             <div key={l.id} className="lame-card" title={`Lame ${l.id}`}>
                               <div className="lame-icon" aria-hidden />
-                              <div className="lame-text">Lame : <strong>{l.id}</strong>  Couleur : <strong>{l.coloration}</strong></div>
+                              <div className="lame-text">Lame : <strong>{l.id}</strong> --   Couleur : <strong>{l.coloration}</strong></div>
                             </div>
                           ))
                         )}
