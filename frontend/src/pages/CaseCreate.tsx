@@ -93,11 +93,11 @@ export function CaseCreate() {
   }
 
   // -- Helpers: validation & keyboard shortcuts --
+  // Deprecated: kept for reference; no longer used for enabling prelevement
   function isBlocComplete(b: BlocDraft): boolean {
     if (!b.id || b.id.trim() === '') return false;
     if (b.lames.length === 0) return false;
-    // Exiger que chaque lame soit validée (et complète)
-    return b.lames.every((l) => l.validated && l.id.trim() !== '' && l.coloration.trim() !== '');
+    return b.lames.every((l) => l.id.trim() !== '' && l.coloration.trim() !== '');
   }
 
   function validateBloc(pIndex: number, bIndex: number): void {
@@ -108,6 +108,21 @@ export function CaseCreate() {
           : p,
       ),
     );
+  }
+
+  // New: a prélèvement is considered complete when all required fields are filled
+  // - p.id non vide
+  // - au moins un bloc
+  // - chaque bloc a un id non vide et au moins une lame
+  // - chaque lame a id et coloration non vides
+  function isPrelevementFieldsComplete(p: PrelevementDraft): boolean {
+    if (!p.id || p.id.trim() === '') return false;
+    if (p.blocs.length === 0) return false;
+    return p.blocs.every((b) => {
+      if (!b.id || b.id.trim() === '') return false;
+      if (b.lames.length === 0) return false;
+      return b.lames.every((l) => l.id.trim() !== '' && l.coloration.trim() !== '');
+    });
   }
 
   function isPrelevementReady(p: PrelevementDraft): boolean {
@@ -136,7 +151,21 @@ export function CaseCreate() {
 
   // Unvalidate (edit again) actions
   function unvalidatePrelevement(pIndex: number): void {
-    setPrelevements((prev) => prev.map((p, i) => (i === pIndex ? { ...p, validated: false } : p)));
+    // Unvalidate the whole prélèvement and unlock all nested blocs/lames
+    setPrelevements((prev) =>
+      prev.map((p, i) => {
+        if (i !== pIndex) return p;
+        return {
+          ...p,
+          validated: false,
+          blocs: p.blocs.map((b) => ({
+            ...b,
+            validated: false,
+            lames: b.lames.map((l) => ({ ...l, validated: false })),
+          })),
+        };
+      }),
+    );
   }
   function unvalidateBloc(pIndex: number, bIndex: number): void {
     setPrelevements((prev) =>
@@ -322,18 +351,14 @@ export function CaseCreate() {
               </span>
             </div>
           )}
-          {!canEditStructure && (
-            <div className="alert" style={{ marginBottom: 12 }}>
-              Renseignez le nom du dossier puis cliquez sur "Valider le nom" ou la touche "Entrée" pour ajouter des prélèvements, blocs et lames.
-            </div>
-          )}
+          {/* helper alert removed per request */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {prelevements.length === 0 && (
               <div className="card card-cta">
                 <button className="btn btn-primary" type="button" onClick={addPrelevement} disabled={!canEditStructure}>
                   + Ajouter un prélèvement
                 </button>
-                <div className="hint">Commencez par créer un premier prélèvement pour ce dossier.</div>
+                {/* hint removed per request */}
               </div>
             )}
             {prelevements.map((p, pIndex) => (
@@ -347,28 +372,37 @@ export function CaseCreate() {
                     disabled={!canEditStructure || p.validated}
                     required
                   />
-                {!p.validated ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => validatePrelevement(pIndex)}
-                    disabled={!isPrelevementReady(p) || !hasAllBlocsAndLamesValidated(p)}
-                  >
-                    Valider le prélèvement
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={() => unvalidatePrelevement(pIndex)}
-                  >
-                    Modifier le prélèvement
-                  </button>
-                )}
-                  <button className="btn btn-ghost" type="button" onClick={() => removePrelevement(pIndex)} disabled={!canEditStructure}>
-                    Supprimer prélèvement
-                  </button>
                   <div style={{ marginLeft: 'auto' }} />
+                  {!p.validated ? (
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={() => validatePrelevement(pIndex)}
+                      disabled={!isPrelevementFieldsComplete(p)}
+                      title="Valider le prélèvement"
+                    >
+                      ✔
+                    </button>
+                  ) : null}
+                  {p.validated && (
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => unvalidatePrelevement(pIndex)}
+                      title="Modifier le prélèvement"
+                    >
+                      Modifier le prélèvement
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={() => removePrelevement(pIndex)}
+                    disabled={!canEditStructure}
+                    title="Supprimer le prélèvement"
+                  >
+                    ✖
+                  </button>
                 </div>
                 <div style={{ marginTop: 8 }}>
                   {p.blocs.map((b, bIndex) => (
@@ -379,30 +413,15 @@ export function CaseCreate() {
                           value={b.id}
                           onChange={(e) => updateBlocId(pIndex, bIndex, e.target.value)}
                           onKeyDown={(e) => onBlocIdKeyDown(pIndex, bIndex, e)}
-                          disabled={!canEditStructure || b.validated}
+                          disabled={!canEditStructure || p.validated}
                           required
                         />
-                        {!b.validated ? (
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={() => validateBloc(pIndex, bIndex)}
-                            disabled={!isBlocComplete(b)}
-                          >
-                            Valider le bloc
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn btn-ghost"
-                            onClick={() => unvalidateBloc(pIndex, bIndex)}
-                          >
-                            Modifier le bloc
+                        {/* per-bloc validate removed */}
+                        {!p.validated && (
+                          <button className="btn btn-danger" type="button" onClick={() => removeBloc(pIndex, bIndex)} disabled={!canEditStructure || p.validated} title="Supprimer le bloc">
+                            ✖
                           </button>
                         )}
-                        <button className="btn btn-ghost" type="button" onClick={() => removeBloc(pIndex, bIndex)} disabled={!canEditStructure || b.validated}>
-                          Supprimer bloc
-                        </button>
                         <div style={{ marginLeft: 'auto' }} />
                       </div>
                       <div className="section level2">
@@ -413,7 +432,7 @@ export function CaseCreate() {
                               value={l.id}
                               onChange={(e) => updateLame(pIndex, bIndex, lIndex, 'id', e.target.value)}
                               placeholder="id lame"
-                              disabled={!canEditStructure || b.validated || (l as any).validated}
+                              disabled={!canEditStructure || p.validated}
                               required
                               onKeyDown={(e) => onLameFieldKeyDown(pIndex, bIndex, l, e)}
                             />
@@ -421,32 +440,26 @@ export function CaseCreate() {
                               value={l.coloration}
                               onChange={(e) => updateLame(pIndex, bIndex, lIndex, 'coloration', e.target.value)}
                               placeholder="coloration"
-                              disabled={!canEditStructure || b.validated || (l as any).validated}
+                              disabled={!canEditStructure || p.validated}
                               required
                               onKeyDown={(e) => onLameFieldKeyDown(pIndex, bIndex, l, e)}
                             />
-                            {!((l as any).validated) ? (
-                              <button className="btn btn-primary" type="button" onClick={() => validateLame(pIndex, bIndex, lIndex)} disabled={!isLameComplete(l as any)}>
-                                Valider la lame
-                              </button>
-                            ) : (
-                              <button className="btn btn-ghost" type="button" onClick={() => unvalidateLame(pIndex, bIndex, lIndex)}>
-                                Modifier la lame
+                            {/* per-lame validate removed */}
+                            {!p.validated && (
+                              <button className="btn btn-danger" type="button" onClick={() => removeLame(pIndex, bIndex, lIndex)} disabled={!canEditStructure || p.validated} title="Supprimer la lame">
+                                ✖
                               </button>
                             )}
-                            <button className="btn btn-ghost" type="button" onClick={() => removeLame(pIndex, bIndex, lIndex)} disabled={!canEditStructure || b.validated}>
-                              Supprimer lame
-                            </button>
                           </div>
                         ))}
-                        <button className="btn" type="button" onClick={() => addLame(pIndex, bIndex)} disabled={!canEditStructure || b.validated}>
+                        <button className="btn" type="button" onClick={() => addLame(pIndex, bIndex)} disabled={!canEditStructure || p.validated}>
                           + Ajouter une lame
                         </button>
                       </div>
                     </div>
                   ))}
                   <div style={{ marginTop: 8 }}>
-                    <button className="btn" type="button" onClick={() => addBloc(pIndex)} disabled={!canEditStructure}>
+                    <button className="btn" type="button" onClick={() => addBloc(pIndex)} disabled={!canEditStructure || p.validated}>
                       + Ajouter un bloc
                     </button>
                   </div>
@@ -462,15 +475,15 @@ export function CaseCreate() {
             )}
           </div>
           <div style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center' }}>
-            <button className="btn btn-primary" type="submit" disabled={submitting || !canEditStructure || !hasValidatedPrelevement()}>
-              {submitting ? 'Création...' : 'Créer'}
-            </button>
+            {hasValidatedPrelevement() && (
+              <button className="btn btn-primary" type="submit" disabled={submitting || !canEditStructure}>
+                {submitting ? 'Création...' : 'Créer'}
+              </button>
+            )}
             <Link className="btn btn-ghost" to="/cases" style={{ whiteSpace: 'nowrap' }}>
               Retour à la liste
             </Link>
-            <span className="muted" style={{ marginLeft: 'auto' }}>
-              (Astuce: Pour créer le dossier, validez au moins un prélèvement, lui‑même contenant au moins un bloc avec une lame)
-            </span>
+            {/* tip removed per request */}
           </div>
         </div>
         {error && <span className="alert alert-error">{error}</span>}

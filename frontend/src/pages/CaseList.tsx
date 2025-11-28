@@ -82,7 +82,7 @@ export function CaseList() {
                   <span className="chip">{blocs} bloc(s)</span>
                   <span className="chip">{lames} lame(s)</span>
                 </div>
-                <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>Cliquer pour voir le détail</div>
+                {/* hint removed per request */}
               </Link>
             );
           })}

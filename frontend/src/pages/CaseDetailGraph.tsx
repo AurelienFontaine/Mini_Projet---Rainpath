@@ -51,40 +51,38 @@ export function CaseDetailGraph() {
       {loading && <div className="muted">Chargement...</div>}
       {error && <div className="alert alert-error">Erreur: {error}</div>}
       {!loading && !error && data && (
-        <div>
-          {data.prelevements.length === 0 ? (
-            <div className="card">Aucun prélèvement</div>
-          ) : (
-            <div className="grid">
-              {data.prelevements.map((p) => (
-                <div key={p.id} className="card">
-                  <strong style={{ color: 'var(--primary-800)' }}>Prélèvement {p.id}</strong>
-                  <div style={{ marginTop: 8 }}>
-                    {p.blocs.length === 0 ? (
-                      <div className="muted">Aucun bloc</div>
-                    ) : (
-                      p.blocs.map((b) => (
-                        <div key={b.id} style={{ borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 8 }}>
-                          <div style={{ marginBottom: 4, color: 'var(--primary-700)' }}>→ Bloc {b.id}</div>
-                          {b.lames.length === 0 ? (
-                            <div className="muted" style={{ marginLeft: 12 }}>Aucune lame</div>
-                          ) : (
-                            <ul className="list">
-                              {b.lames.map((l) => (
-                                <li key={l.id}>
-                                  Lame {l.id} - <em className="muted">Couleur(s) : {l.coloration}</em>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              ))}
+        <div className="visual-flow">
+          {data.prelevements.length === 0 && <div className="card">Aucun prélèvement</div>}
+          {data.prelevements.map((p) => (
+            <div key={p.id} className="visual-card card">
+              <div className="visual-header">
+                <div className="node node-prelevement" title={`Prélèvement ${p.id}`}>{p.id}</div>
+              </div>
+              <div className="blocks-row">
+                {p.blocs.length === 0 ? (
+                  <div className="muted">Aucun bloc</div>
+                ) : (
+                  p.blocs.map((b) => (
+                    <div key={b.id} className="block-card">
+                      <div className="block-title">Bloc {b.id}</div>
+                      <div className="lames-row">
+                        {b.lames.length === 0 ? (
+                          <span className="muted" style={{ fontSize: 12 }}>Aucune lame</span>
+                        ) : (
+                          b.lames.map((l) => (
+                            <div key={l.id} className="lame-card" title={`Lame ${l.id}`}>
+                              <div className="lame-icon" aria-hidden />
+                              <div className="lame-text">Lame : <strong>{l.id}</strong>  Couleur : <strong>{l.coloration}</strong></div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          )}
+          ))}
         </div>
       )}
     </section>
